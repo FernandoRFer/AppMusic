@@ -1,0 +1,195 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter_application_1/SearchDelegate.dart';
+import 'package:flutter_application_1/services/music_service.dart';
+import 'package:animation_search_bar/animation_search_bar.dart';
+import 'package:flutter_application_1/services/musica.dart';
+import 'models/music_model.dart';
+
+import 'package:anim_search_bar/anim_search_bar.dart';
+
+class Pesquisa extends StatefulWidget {
+  const Pesquisa({super.key});
+
+  @override
+  State<Pesquisa> createState() => _MyWidgetState();
+}
+
+class _MyWidgetState extends State<Pesquisa> {
+  //TextEditingController textController = TextEditingController();
+
+  var pesquisa = "";
+  var _resultado = '';
+
+  //List<MusicModel> musicas = [];
+
+  _getMusic() async {
+    MusicSer api = MusicSer();
+    return api.getData(_resultado);
+  }
+
+  /*<void> _getMusicas() {
+    final service = MusicService();
+
+    var map = <String, dynamic>{};
+    map["filtroNome"] = _resultado;
+
+    return service.getData(map).then((value) {
+      if (mounted) {
+        setState(() {
+          for (var i = 0; i < value.length; i++) {
+            musicas.add(MusicModel.fromJson(value[i]));
+          }
+        });
+      }
+    });
+  }
+*/
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      extendBody: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        title: Text('Buscas'),
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+            gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: const [
+              Color.fromARGB(255, 0, 0, 0),
+              Color.fromARGB(255, 51, 23, 23),
+              Color.fromARGB(255, 0, 0, 0),
+            ])),
+        width: MediaQuery.of(context).size.width,
+        height: MediaQuery.of(context).size.height,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FutureBuilder<List<MusicModel>>(
+                  future: _getMusic(),
+                  builder: (contex, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.none:
+                      case ConnectionState.waiting:
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                        break;
+                      case ConnectionState.active:
+                      case ConnectionState.done:
+                        if (snapshot.hasData) {
+                          return ListView.builder(
+                              itemBuilder: (context, index) {
+                                List<MusicModel>? musicas = snapshot.data;
+                                MusicModel musica = musicas![index];
+                                return GestureDetector(
+                                  onTap: () {
+                                    print("object")
+                                  },
+                                  child: Column(
+                                    children: <Widget>[
+                                      Container(
+                                        color: Colors.black12,
+                                        child: ListTile(
+                                          textColor: Colors.white,
+                                          title: Text(
+                                            musica.nomeMusica,
+                                          ),
+                                          subtitle: Text(
+                                            musica.artista,
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                );
+                              },
+                              /*separatorBuilder: (context, index) => Divider(
+                                              height: 2,
+                                              color: Color.fromARGB(255, 255, 255, 255),
+                                            ),*/
+                              itemCount: snapshot.data!.length);
+                        } else {
+                          return Center(
+                            child: Text("Nenhum dado a ser exibido!"),
+                          );
+                        }
+                        break;
+                    }
+                  }),
+            ),
+          ],
+        ),
+      ),
+
+      /* child: Padding(
+          padding: EdgeInsets.all(15),
+          child: ListView.builder(
+            itemCount: musicas.length,
+            itemBuilder: (BuildContext context, int index) {
+              return Column(children: [
+                Text(musicas[index].nomeMusica ?? ""),
+                Text(musicas[index].cifra ?? "")
+              ]);
+            },
+          ),
+        ),
+
+        
+                TextField(
+                  onChanged: (text) {
+                    setState(() {
+                      pesquisa = text;
+                    });
+                    _getMusicas();
+                  },
+                  obscureText: false,
+                  style: TextStyle(color: Colors.white70),
+                  decoration: InputDecoration(
+                    enabledBorder: OutlineInputBorder(
+                      borderSide:
+                          const BorderSide(color: Colors.white60, width: 2.0),
+                      borderRadius: BorderRadius.circular(40),
+                    ),
+                    labelText: 'Busca',
+                    labelStyle: TextStyle(color: Colors.white70),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(40)),
+                    focusedBorder: OutlineInputBorder(
+                        borderSide:
+                            const BorderSide(color: Colors.white70, width: 2.0),
+                        borderRadius: BorderRadius.circular(40)),
+                  ),
+                ),
+                 ListView.builder(
+                  itemCount: musicas.length,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Column(children: [
+                      Text(musicas[index].nomeMusica ?? ""),
+                      Text(musicas[index].cifra ?? "")
+                    ]);
+                  },
+                ), */
+
+      /* floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result =
+              await showSearch(context: context, delegate: SearchMusic());
+          setState(() {
+            _resultado = result.toString();
+          });
+        },
+        backgroundColor: Colors.white30,
+        child: const Icon(Icons.search),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,*/
+    );
+  }
+}
